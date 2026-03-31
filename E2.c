@@ -6,6 +6,7 @@
 #define MULTIPLIER 31
 #define MAX_LEN 100
 
+//Khởi tạo struct
 struct wordrec
 {
     char* word;
@@ -13,26 +14,23 @@ struct wordrec
     struct wordrec* next;
 };
 
+//Cấp bộ nhớ cho node mới của wordrec
 struct wordrec* walloc(const char* str)
 {
     struct wordrec* p=(struct wordrec*)malloc(sizeof(struct wordrec));
     if(p!=NULL)
     {
         p->count=0;
-        p->word=strdup(str); /* creates a duplicate */
+        p->word=strdup(str); //Tạo ra chuỗi copy.
         p->next=NULL;
     }
     return p;
 }
 
-/* hash bucket */
-struct wordrec* table[MAX_LEN];
+//Khởi tạo hash bucket.
+struct wordrec* table[MAX_BUCKETS];
 
-/*
-@function hashstring
-@desc produces hash code for a string
-multipliers 31,35 have been found to work well
-*/
+//Tạo ra chuỗi hash cho ký tự.
 unsigned long hashstring(const char* str)
 {
     unsigned long hash=0;
@@ -44,11 +42,9 @@ unsigned long hashstring(const char* str)
     return hash%MAX_BUCKETS;
 }
 
-/*
-@function lookup
-@desc returns a pointer to the word or creates
-it if required
-*/
+//Hàm để tính chuỗi hash, vào bucket của chuỗi hash và tìm bằng strcmp, 
+//trả lại pointer nếu tìm thấy từ đó. Nếu không tìm thấy
+//sẽ tạo ra một node mới và đẩy lên đầu hash index.
 struct wordrec* lookup(const char* str, int create)
 {
     unsigned long hash=hashstring(str);
@@ -59,24 +55,18 @@ struct wordrec* lookup(const char* str, int create)
         {
             return curr;
         }
-
-    /* not found */
     if(create)
     {
         curr=(struct wordrec*)malloc(sizeof(struct wordrec));
         curr->word=strdup(str);
         curr->count=0;
-        /* add to front */
         curr->next=table[hash];
         table[hash]=curr;
     }
     return curr;
 }
 
-/*
-@function cleartable()
-@desc reclaims memory
-*/
+//Hàm giải phóng bộ nhớ đã cấp
 void cleartable()
 {
     struct wordrec* wp=NULL, *p=NULL;
@@ -94,28 +84,28 @@ void cleartable()
     }
 }
 
+//Hàm main
 int main(int argc, char* argv[])
 {
-    FILE* fp=fopen("book.txt", "r");
-    char word[1024]; /* big enough */
+    FILE* fp=fopen("book.txt", "r"); //Đọc dữ liệu từ file book.txt 
+    char word[1024];
     struct wordrec* wp=NULL;
     int i=0;
 
+    //Bắt table bắt đầu với dữ liệu NULL
     memset(table, 0, sizeof(table));
 
-    /* read from input */
+    //Đọc từ đầu vào
     while(1)
     {
         if(fscanf(fp, "%s", word)!=1)
             break;
-        wp=lookup(word, 1); /* create if doesn't exist */
+        wp=lookup(word, 1); //Tìm và tạo nếu không tồn tại
         wp->count++;
     }
     fclose(fp);
 
-    /*
-    print all words with frequency >100
-    */
+    //Hàm in ra tất cả các từ mà có tần xuất > 1000
     for(i=0; i<MAX_BUCKETS; i++)
     {
         for(wp=table[i]; wp!=NULL; wp=wp->next)

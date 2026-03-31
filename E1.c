@@ -4,6 +4,7 @@
 
 #define MAX_STUDENTS 10
 
+//Khởi tạo struct
 struct student 
 {
     char fname[100];
@@ -12,6 +13,7 @@ struct student
     int age;
 };
 
+//Khởi tạo dữ liệu
 struct student class[] = 
 {
     "Sean", "Penn", 2, 21,
@@ -26,6 +28,7 @@ struct student class[] =
     "Sarah", "Palin", 2, 19
 };
 
+//Hàm so sánh tên
 int compare_fname(const void* a, const void* b)
 {
     struct student* sa = (struct student*)a;
@@ -33,6 +36,7 @@ int compare_fname(const void* a, const void* b)
     return strcmp(sa -> fname, sb -> fname);
 }
 
+//Hàm so sánh họ
 int compare_lname (const void* a, const void* b)
 {
     struct student* sa = (struct student*)a;
@@ -40,6 +44,7 @@ int compare_lname (const void* a, const void* b)
     return strcmp(sa -> lname, sb -> lname);
 }
 
+//Hàm lưu lại thay đổi về dữ liệu
 void apply(struct student* sarr, int nrec, void (*fp)(void* prec, void* arg), void* arg)
 {
     int i = 0;
@@ -49,12 +54,14 @@ void apply(struct student* sarr, int nrec, void (*fp)(void* prec, void* arg), vo
     }
 }
 
+//Hàm in ra dữ liệu về học sinh
 void printrec(void* prec, void* arg)
 {
     struct student* pstud = (struct student*)prec;
     printf("%-20s %-20s %2d %2d\n", pstud -> fname, pstud -> lname, pstud -> year, pstud -> age);
 }
 
+//Hàm so sánh và in ra kết quả khi học sinh có số tuổi lớn hơn số tuổi so sánh
 void isolder(void* prec, void* arg)
 {
     int* age = (int*)arg;
@@ -65,29 +72,34 @@ void isolder(void* prec, void* arg)
         printf("%-20s %-20s %2d %2d\n", pstud -> fname, pstud -> lname, pstud -> year, pstud -> age);
 }
 
+//Hàm main
 int main()
 {
+    //Khởi tạo dữ liệu ban đầu
     int nstudents = sizeof(class)/sizeof(struct student);
     int age;
 
+    //In ra danh sách sinh viên trước khi chỉnh sửa
     puts("----------------");
     puts("Initiate");
     puts("----------------");
     apply(class, nstudents, printrec, NULL);
 
+    //Sắp xếp học sinh theo tên
     puts("----------------");
     puts("Sort by first name");
     puts("----------------");
     qsort(class, nstudents, sizeof(struct student), compare_fname);
     apply(class, nstudents, printrec, NULL);
 
+    //Sắp xếp học sinh theo họ
     puts("----------------");
     puts("Sort by last name");
     puts("----------------");
     qsort(class, nstudents, sizeof(struct student), compare_lname);
     apply(class, nstudents, printrec, NULL);
 
-
+    //Sắp xếp học sinh theo tuổi (20 tuổi)
     puts("---------------");
     puts("Sort by age 20");
     puts("----------------");
